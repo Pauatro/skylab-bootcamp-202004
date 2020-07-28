@@ -14,7 +14,7 @@ The user can then navigate through a series of related terms from the HPO databa
 
 Once the most accurate term is submitted the user can add a series of details such as position or severity, and add comments to the symptom. 
 
-The user will be able to collect a list of symptoms and then receive that e-mail with their symptom list.
+The user is then be able to generate a symptom list and then receive it by e-mail.
 
 The data from the user navigation, submitted symptoms and the symptom lists are collected anonymously in order to evaluate the usage of the app and its performance.
 
