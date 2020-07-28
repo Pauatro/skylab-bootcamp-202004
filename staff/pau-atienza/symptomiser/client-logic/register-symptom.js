@@ -22,7 +22,7 @@
  * @throws {Error} If there is a server error.
  */
 
- require('commons/polyfills/string')
+require('commons/polyfills/string')
 require('commons/polyfills/number')
 require('commons/polyfills/date')
 require('commons/polyfills/json')

@@ -17,5 +17,9 @@ module.exports = {
     sendSymptomlistByEmail: require('./send-symptomlist-by-email'),
     retrieveResultsFromStorage: require('./retrieve-results-from-storage'),
     retrieveSymptomToModifyFromStorage: require('./retrieve-symptom-to-modify-from-storage'),
-    retrieveSubmittedSymptomsFromStorage: require('./retrieve-submitted-symptoms-from-storage')
+    retrieveSubmittedSymptomsFromStorage: require('./retrieve-submitted-symptoms-from-storage'),
+    loginAdmin: require('./login-admin'),
+    confirmLogin: require('./confirm-login'),
+    retrieveAllSymptoms: require('./retrieve-all-symptoms'),
+    retrieveAllSymptomLists: require('./retrieve-all-symptomlists')
 }

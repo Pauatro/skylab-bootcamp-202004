@@ -20,6 +20,7 @@
     "xhr2": "^0.2.0"
   },
   "dependencies": {
+    "blob": "^0.1.0",
     "commons": "file:../commons",
     "data": "file:../data",
     "moca": "^0.4.3",

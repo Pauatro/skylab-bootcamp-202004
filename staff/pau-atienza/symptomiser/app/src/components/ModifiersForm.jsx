@@ -1,20 +1,15 @@
 import React from 'react'
 import arrow from '../images/up-arrow.svg'
-import {useEffect, useState} from 'react'
-
+import { useEffect, useState } from 'react'
 import Feedback from './Feedback'
+import { retrieveTermsById, updateSymptom, addModifierToSymptom, deleteModifierFromSymptom, retrieveSymptomToModifyFromStorage } from 'client-logic'
 
-import { retrieveTermsById, addModifierToSymptom, deleteModifierFromSymptom, deleteCommentsFromSymptom, retrieveSymptomToModifyFromStorage } from 'client-logic'
-import {generateWrittenSymptom} from 'client-logic/helpers'
-
-export default function( {  saveModifiedSymptom, feedback } ) {
+export default function( { goToSymptomList } ) {
 
     const [modifier, setModifier] = useState(null)
-    const [writtenSymptom, setWrittenSymptom] = useState(generateWrittenSymptom(retrieveSymptomToModifyFromStorage()))
     const [showConfidence, setShowConfidence] = useState(null)
     const [symptomToModify, setSymptomToModify] = useState(retrieveSymptomToModifyFromStorage())
-    const [deleteMode, setDeleteMode] = useState(false)
-    const [modifiersFeedback, setModifiersFeedback] = useState(null)
+    const [feedback, setFeedback] = useState(null)
 
 
     useEffect(()=>{
@@ -23,7 +18,7 @@ export default function( {  saveModifiedSymptom, feedback } ) {
         }catch(error){
             const { message } = error
     
-            setModifiersFeedback({level: "error", message})
+            setFeedback({level: "error", message})
         }
     }, [symptomToModify])
 
@@ -31,9 +26,9 @@ export default function( {  saveModifiedSymptom, feedback } ) {
         try{
             setModifier(await retrieveTermsById(id))
         }catch(error){
-          const { message } = error
+            const { message } = error
     
-          setModifiersFeedback({level: "error", message})
+            setFeedback({level: "error", message})
         }
     }
 
@@ -43,22 +38,12 @@ export default function( {  saveModifiedSymptom, feedback } ) {
 
             setSymptomToModify(modifiedSymptom)
             setShowConfidence(false)
-            setWrittenSymptom(generateWrittenSymptom(modifiedSymptom))
-            setModifiersFeedback({ level: "success", message: "The modifier was added. Don't forget to save the changes before you continue."})
+            setFeedback({ level: "success", message: "The modifier was added. Don't forget to save the changes before you continue."})
         }catch(error){
-          const { message } = error
-    
-          setModifiersFeedback({level: "error", message})
+            const { message } = error
+        
+            setFeedback({level: "error", message})
         }
-    }
-
-    const toggleAllowDeletion = event=>{
-        event.preventDefault()
-
-        setModifiersFeedback(null)
-
-        setDeleteMode(!deleteMode)
-        setWrittenSymptom(generateWrittenSymptom(symptomToModify))
     }
 
     const deleteModifier = name=>{
@@ -66,47 +51,56 @@ export default function( {  saveModifiedSymptom, feedback } ) {
             const modifiedSymptom = deleteModifierFromSymptom(name)
     
             setSymptomToModify(modifiedSymptom)
-            setWrittenSymptom(generateWrittenSymptom(modifiedSymptom))
-            setModifiersFeedback({ level: "success", message: "The modifier was deleted. Don't forget to save the changes in the details section before you continue."})
+            setFeedback({ level: "success", message: "The modifier was deleted. Don't forget to save the changes in the details section before you continue."})
 
         }catch(error){
-          const { message } = error
-    
-          setModifiersFeedback({level: "error", message})
+            const { message } = error
+        
+            setFeedback({level: "error", message})
         }
     }
 
-    const deleteComments = ()=>{
+    const saveModifiedSymptom = async event =>{
         try{
-            const modifiedSymptom = deleteCommentsFromSymptom()
+            event.preventDefault()
     
-            setSymptomToModify(modifiedSymptom)
-            setWrittenSymptom(generateWrittenSymptom(modifiedSymptom))
-            setModifiersFeedback({ level: "success", message: "The comments were deleted. Don't forget to save the changes in the details section before you continue."})
+            const comments = event.target.form.comment.value
+            await updateSymptom(comments)
+            goToSymptomList()
         }catch(error){
-          const { message } = error
-    
-          setModifiersFeedback({level: "error", message})
+            const { message } = error
+
+            setFeedback({level: "error", message})
         }
     }
 
-    return !deleteMode?<section className="form">
-        {feedback && <Feedback message = {feedback.message} level = {feedback.level}/>}
-        {modifiersFeedback && <Feedback message = {modifiersFeedback.message} level = {modifiersFeedback.level}/>}
-        {symptomToModify?<form className="form__main">
-            <div className="form__element"> 
-                <h2 className="form__element--name">Symptom Information</h2>
-                <textarea readOnly cols = "10" rows = "20" wrap = "soft" className="form__element--input" name="symptom" spellCheck = 'false' value={writtenSymptom}/>
-            </div>
-            <div className="form__element"> 
-                <textarea cols = "10" rows = "20" wrap = "soft" className="form__element--input" spellCheck = 'false' type = "text" name="comment" placeholder = "Write any additional comments here" defaultValue = {symptomToModify.comments?symptomToModify.comments:''}/>
-            </div>
-            <div className = "form__element">
-                <button className="symptom__term" onClick = {toggleAllowDeletion}>Delete comments or modifiers</button>
-                <button type = 'submit' onClick = {event =>saveModifiedSymptom(event)}>Save changes</button>
-            </div>
-        </form>: <p>You didn't select a symptom to add details to.</p>}
-
+    return <>
+        <section className="form">
+            {feedback && <Feedback message = {feedback.message} level = {feedback.level}/>}
+            {symptomToModify?<form className="form__main">
+                <h2 className="form__element--name">Symptom Information:</h2>
+                <div className = "form__symptom">
+                    <p>Term:</p>
+                    <p>{symptomToModify.term.name}</p>
+                </div >
+                <ul className = "form__modifiers">
+                    <p>Clinical modifiers:</p>
+                    {symptomToModify.modifiers && symptomToModify.modifiers.length?<>
+                        {symptomToModify.modifiers.map(modifier=><li key = {modifier.HPO_id}>
+                            <p>{modifier.name}</p>
+                            <button className="symptom__term" onClick = {()=>deleteModifier(modifier.name)}>Delete</button>
+                        </li>)}
+                    </>: "You haven't added any modifiers yet"}
+                </ul>
+                <div className="form__element"> 
+                    <p>Comments:</p>
+                    <textarea maxLength = "200" wrap = "soft" className="form__element--input" spellCheck = 'false' type = "text" name="comment" placeholder = "Write any additional comments here" defaultValue = {symptomToModify.comments?symptomToModify.comments:''}/>
+                </div>
+                <div className = "form__button">
+                    <button type = 'submit' onClick = {event =>saveModifiedSymptom(event)}>Save changes</button>
+                </div>
+            </form>: <p>You haven't selected a symptom to add details to.</p>}
+        </section>
         <section className="symptom">
             {modifier && <>{modifier.higher.length && modifier.higher[0].name !== 'All'?<header className="symptom__top">
                 <ul className="symptom__bottom--terms">
@@ -146,7 +140,7 @@ export default function( {  saveModifiedSymptom, feedback } ) {
             {modifier.lower.length? 
             <footer className="symptom__bottom">
                 {modifier.term.HPO_id !== "HP:0012823"  && <>
-                    <p>More specific terms: check if any of these fit with your symptom</p>
+                    <p>More specific terms: you need to navigate to the most specific terms to submit</p>
                     <img alt = "" className="symptom__bottom--arrow" src={arrow} />
                 </>}
                 <ul className="symptom__bottom--terms">
@@ -157,27 +151,5 @@ export default function( {  saveModifiedSymptom, feedback } ) {
                 </ul></footer>: <></>}
             </>}
         </section>
-    </section>
-    :
-    <section className="form">
-        {feedback && <Feedback message = {feedback.message} level = {feedback.level}/>}
-        {modifiersFeedback && <Feedback message = {modifiersFeedback.message} level = {modifiersFeedback.level}/>}
-        <div className = "form__symptom">
-            <p>Term: {symptomToModify.term.HPO_id}: {symptomToModify.term.name}</p>
-        </div >
-        <ul className = "form__modifiers">
-            {symptomToModify.modifiers && symptomToModify.modifiers.length?<>
-                <p>Modifiers:</p>
-                {symptomToModify.modifiers.map(modifier=><li key = {modifier.HPO_id}>
-                    <p>{modifier.HPO_id}: {modifier.name}</p>
-                    <button className="symptom__term" onClick = {()=>deleteModifier(modifier.name)}>Delete</button>
-                </li>)}
-            </>: ""}
-        </ul>
-        {symptomToModify.comments && <div className = "form__comments">
-            <p>Comments:</p> <p>{symptomToModify.comments}</p>
-            <button className="symptom__term" onClick = {deleteComments}>Delete</button>
-        </div>}
-        <button className="symptom__term" onClick = {toggleAllowDeletion}>Back to Symptom Details</button>
-    </section>
+    </>
 }

@@ -15,6 +15,7 @@ global.fetch = require('node-fetch')
 
 module.exports = function (query) {
     String.validate.notVoid(query) 
+    String.isAlphabetic(query) 
     
     return (async function(url){
         const {status, body} = await call('GET', `${url}/terms/query/${query}`, undefined, undefined)

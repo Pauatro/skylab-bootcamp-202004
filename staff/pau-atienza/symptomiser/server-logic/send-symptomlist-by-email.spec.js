@@ -24,7 +24,7 @@ describe('server logic - send-symptomlist-by-email', () => {
 
     it('should succeed on correct inputs', () =>
         sendSymptomListByEmail(email, text, html)
-    )
+    ).timeout(5000)
 
 
     it('should fail when input does not fit the format', () => {

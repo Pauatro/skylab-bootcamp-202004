@@ -7,5 +7,7 @@ module.exports = {
     sendSymptomlistByEmail: require('./send-symptomlist-by-email'),
     registerAdmin: require('./register-admin'),
     authenticateAdmin: require('./authenticate-admin'),
-    retrieveAllSymptoms: require('./retrieve-all-symptoms')
+    retrieveAllSymptoms: require('./retrieve-all-symptoms'),
+    retrieveAllSymptomLists: require('./retrieve-all-symptomlists'),
+    confirmSession: require('./confirm-session')
 }

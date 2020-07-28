@@ -1,7 +1,7 @@
 const { env: { SECRET } } = process
 
 const { Router } = require('express')
-const { retrieveTermsById, retrieveTermsByQuery, registerSymptom, registerSymptomList, updateSymptom, sendSymptomlistByEmail, registerAdmin, authenticateAdmin, retrieveAllSymptoms } = require('./handlers')
+const { retrieveTermsById, retrieveTermsByQuery, registerSymptom, registerSymptomList, updateSymptom, sendSymptomlistByEmail, registerAdmin, authenticateAdmin, retrieveAllSymptoms, retrieveAllSymptomLists, confirmSession } = require('./handlers')
 const bodyParser = require('body-parser')
 const { jwtVerifierExtractor } = require('../middlewares')
 const { handleError } = require('../helpers')
@@ -21,6 +21,8 @@ api.post('/symptoms/update', parseBody, updateSymptom)
 
 api.get('/symptoms/retrieve', verifyExtractJwt, retrieveAllSymptoms)
 
+api.get('/symptomlists/retrieve', verifyExtractJwt, retrieveAllSymptomLists)
+
 api.post('/symptomlists', parseBody, registerSymptomList)
 
 api.post('/symptomlists/email', parseBody, sendSymptomlistByEmail)
@@ -28,6 +30,8 @@ api.post('/symptomlists/email', parseBody, sendSymptomlistByEmail)
 api.post('/admins', parseBody, registerAdmin)
 
 api.post('/admins/auth', parseBody, authenticateAdmin)
+
+api.post('/admins/auth/confirm', verifyExtractJwt, confirmSession)
 
 module.exports = {
     api
