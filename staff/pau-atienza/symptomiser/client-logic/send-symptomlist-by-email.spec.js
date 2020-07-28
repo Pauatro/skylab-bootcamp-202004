@@ -33,13 +33,13 @@ describe('server logic - send-symptomlist-by-email', () => {
     it('should succeed on correct inputs', async() =>{
         await sendSymptomlistByEmail(email)
 
-    })
+    }).timeout(10000)
 
     it('should succeed without modifiers or comments', async () =>{
         context.storage.submittedSymptoms = JSON.stringify([{term: {HPO_id, name, confidenceLevel}, modifiers: undefined, comments: undefined}])
 
         await sendSymptomlistByEmail(email)
-    })
+    }).timeout(10000)
 
     it('should fail when input does not fit the format', async () => {
         email = ""

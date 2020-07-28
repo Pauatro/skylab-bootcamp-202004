@@ -11,7 +11,7 @@
  * @throws {Error} If e-mail does not match the expected format.
  */
 
- require('commons/polyfills/string')
+require('commons/polyfills/string')
 require('commons/polyfills/json')
 const { utils: { Email }, errors: { DuplicityError } } = require('commons')
 const { models: { Admin } } = require('data')

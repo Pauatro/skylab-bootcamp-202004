@@ -1,17 +1,44 @@
 import React from 'react'
 
+import { useState } from 'react'
+
 import { Link } from 'react-router-dom'
 
 import Feedback from './Feedback'
 
 import search from '../images/search-icon.png'
 
-export default function({onSubmit, feedback}) {
+import { retrieveTermsByQuery, savePredictorInput, savePredictorOutput } from 'client-logic'
+
+export default function({ goToResults }) {
+
+    const [feedback, setFeedback] = useState(null)
+
+    const symptomQuery = async event =>{
+        event.preventDefault()
+
+        const query = event.target.query.value
+        try{
+            savePredictorInput(query)
+        
+            const results = await retrieveTermsByQuery(query)
+
+            savePredictorOutput(results)
+
+            goToResults()
+        }catch(error){
+            const { message } = error
+
+            setFeedback({level: "error", message})
+        }
+    }
+
+
     return <section className="landing">
         <h1 className="landing__title">Symptomiser</h1>
         <main className="landing__main">
-            <form className="landing__main--form" onSubmit = {onSubmit}>
-                <input className="landing__main--input" name="query" required minLength = "2" spellCheck = 'false' placeholder="Describe your symptom in a few words" />
+            <form className="landing__main--form" onSubmit = {symptomQuery}>
+                <input className="landing__main--input" name="query" required minLength = "2" spellCheck = 'false' placeholder="Describe your symptom in a few words" pattern="[a-zA-Z ]+" />
                 <button className="landing__main--button" type = "submit">
                     <img alt = "" className="landing__main--image" src = {search}></img>
                 </button>

@@ -15,6 +15,7 @@ const context = require('./context')
 
 module.exports = function(query){
     String.validate.notVoid(query)
+    String.isAlphabetic(query) 
 
     return (async ()=>{
         const { status, body } = await call('GET', `${this.PREDICTOR_URL}?content=${query}&limit=${this.LIMIT}`,null, null)

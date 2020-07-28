@@ -2,16 +2,16 @@ import React from 'react'
 
 import Feedback from './Feedback'
 
-import {generateWrittenSymptom} from 'client-logic/helpers'
-import {deleteSymptom, registerSymptomList, sendSymptomlistByEmail, retrieveSubmittedSymptomsFromStorage } from 'client-logic'
+import { generateWrittenSymptom } from 'client-logic/helpers'
+import { deleteSymptom, registerSymptomList, sendSymptomlistByEmail, retrieveSubmittedSymptomsFromStorage } from 'client-logic'
 import { useEffect, useState } from 'react'
 
-export default function( { goToDetails, feedback} ) {
+export default function( { goToDetails } ) {
 
   const [symptomList, setSymptomList] = useState(retrieveSubmittedSymptomsFromStorage())
   const [writtenSymptoms, setWrittenSymptoms] = useState(null)
   const [askEmail, setAskEmail] = useState(false)
-  const [listFeedback, setListFeedback] = useState(null)
+  const [feedback, setFeedback] = useState(null)
   
   useEffect(()=>{
     try{
@@ -22,7 +22,7 @@ export default function( { goToDetails, feedback} ) {
     }catch(error){
       const { message } = error
 
-      setListFeedback({level: "error", message})
+      setFeedback({level: "error", message})
     }
   }, [symptomList])
 
@@ -38,12 +38,12 @@ export default function( { goToDetails, feedback} ) {
     try{
       deleteSymptom(name)
 
-      setListFeedback({level: "success", message: "The symptom was successfully deleted"})
+      setFeedback({level: "success", message: "The symptom was successfully deleted"})
       setSymptomList(retrieveSubmittedSymptomsFromStorage())
     }catch(error){
       const { message } = error
 
-      setListFeedback({level: "error", message})
+      setFeedback({level: "error", message})
     }
   }
 
@@ -55,7 +55,7 @@ export default function( { goToDetails, feedback} ) {
     }catch(error){
       const { message } = error
 
-      setListFeedback({level: "error", message})
+      setFeedback({level: "error", message})
     }
   }
 
@@ -65,18 +65,17 @@ export default function( { goToDetails, feedback} ) {
     const email = event.target.form.email.value
     try{
       sendSymptomlistByEmail(email)
-      setListFeedback({level: "success", message: `We have sent an e-mail to ${email} with the symptom list`})
+      setFeedback({level: "success", message: `We have sent an e-mail to ${email} with the symptom list`})
 
     }catch(error){
       const { message } = error
 
-      setListFeedback({level: "error", message})
+      setFeedback({level: "error", message})
     }
   }
 
   return <section className="list">
     {feedback && <Feedback message = {feedback.message} level = {feedback.level}/>}
-    {listFeedback && <Feedback message = {listFeedback.message} level = {listFeedback.level}/>}
     <h1 className="list__title">Submitted symptoms</h1>
     <ul className="list__list">
       {symptomList?<>
